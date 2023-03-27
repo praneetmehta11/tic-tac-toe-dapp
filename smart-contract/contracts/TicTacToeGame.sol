@@ -45,6 +45,12 @@ contract TicTacToeGame {
 
     mapping(address => uint256) userActiveGame;
 
+    function getUserActiveGame(
+        address _address
+    ) public view returns (uint256 _gameId) {
+        return userActiveGame[_address];
+    }
+
     function addRoomType(
         address _paytoken,
         uint256 _betamount,
@@ -338,7 +344,7 @@ contract TicTacToeGame {
             "validation faield: invalid game id"
         );
         Game storage g = games[_gameId];
-        require(g.balance > 0, "already claimed");
+        require(g.balance > 0, "prize already claimed");
         require(block.timestamp <= g.deadline, "winner not declared yet");
         address from = msg.sender;
         address winner;
