@@ -35,11 +35,11 @@ contract TicTacToeGame {
         uint256[3][3] board;
         uint256 deadline;
         bool isRunning;
-        uint256 roomInfo;
+        uint256 roomId;
         uint256 balance;
     }
 
-    RoomInfo[] private roomInfo;
+    RoomInfo[] private rooms;
 
     Game[] private games;
 
@@ -51,7 +51,7 @@ contract TicTacToeGame {
         uint256 _timelimit
     ) external {
         IERC20 paytoken = IERC20(_paytoken);
-        roomInfo.push(
+        rooms.push(
             RoomInfo({
                 payToken: paytoken,
                 betAmount: _betamount,
@@ -61,19 +61,19 @@ contract TicTacToeGame {
             })
         );
         // paytoken.approve(address(this), 2**256 - 1);
-        emit RoomAdded(roomInfo.length - 1);
+        emit RoomAdded(rooms.length - 1);
     }
 
-    function getRoomTypeCount() public view returns (uint256 count) {
-        return roomInfo.length;
+    function getRoomsCount() public view returns (uint256 count) {
+        return rooms.length;
     }
 
     function joinGame(uint256 _roomid, string memory _name) external {
         address from = msg.sender;
 
         require(userActiveGame[from] == 0, "can not join the game");
-        require(_roomid >= 0 && _roomid < roomInfo.length, "invalid room id");
-        RoomInfo storage ri = roomInfo[_roomid];
+        require(_roomid >= 0 && _roomid < rooms.length, "invalid room id");
+        RoomInfo storage ri = rooms[_roomid];
         // require(
         //     ri.payToken.allowance(msg.sender, address(this)) >= ri.betAmount,
         //     "you have to approve control of tokens"
@@ -101,7 +101,7 @@ contract TicTacToeGame {
                     board: board,
                     deadline: 0,
                     isRunning: false,
-                    roomInfo: _roomid,
+                    roomId: _roomid,
                     balance: ri.betAmount
                 })
             );
@@ -159,7 +159,7 @@ contract TicTacToeGame {
             delete userActiveGame[g.player2];
             emit WinnerDecleared(_gameId, from);
             // transfer money to winner
-            // roomInfo[g.roomInfo].payToken.transferFrom(
+            // rooms[g.rooms].payToken.transferFrom(
             //     address(this),
             //     g.turn,
             //     g.balance
@@ -168,13 +168,13 @@ contract TicTacToeGame {
             g.balance = 0;
         } else if (_isBoardFull(_gameId) == true) {
             g.isRunning = false;
-            roomInfo[g.roomInfo].payToken.transferFrom(
+            rooms[g.roomId].payToken.transferFrom(
                 address(this),
                 g.player1,
                 g.balance / 2
             );
             g.balance -= g.balance / 2;
-            // roomInfo[g.roomInfo].payToken.transferFrom(
+            // rooms[g.rooms].payToken.transferFrom(
             //     address(this),
             //     g.player2,
             //     g.balance
@@ -189,7 +189,7 @@ contract TicTacToeGame {
             if (player == 1) {
                 g.turn = g.player2;
             }
-            g.deadline = block.timestamp + roomInfo[g.roomInfo].timelimit;
+            g.deadline = block.timestamp + rooms[g.roomId].timelimit;
         }
     }
 
@@ -295,8 +295,8 @@ contract TicTacToeGame {
         view
         returns (address _payToken, uint256 _betAmount, uint256 _timelimit)
     {
-        require(_roomid >= 0 && _roomid < roomInfo.length, "invalid room id");
-        RoomInfo memory ri = roomInfo[_roomid];
+        require(_roomid >= 0 && _roomid < rooms.length, "invalid room id");
+        RoomInfo memory ri = rooms[_roomid];
         return (address(ri.payToken), ri.betAmount, ri.timelimit);
     }
 
@@ -349,7 +349,7 @@ contract TicTacToeGame {
         }
         require(from == winner, "validation faield: you are not a winner");
         emit PrizeClaimed(_gameId, from);
-        // roomInfo[g.roomInfo].payToken.transferFrom(
+        // rooms[g.roomId].payToken.transferFrom(
         //     address(this),
         //     from,
         //     g.balance
