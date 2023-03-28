@@ -17,7 +17,7 @@ contract TicTacToeGame is Ownable {
         address _turn
     );
     event Move(uint256 _gameid, address playedBy, uint256 r, uint256 c);
-    event WinnerDecleared(uint256 _gameid, address winner);
+    event WinnerDeclared(uint256 _gameid, address winner);
     event GameDraw(uint256 _gameid);
     event PrizeClaimed(uint256 _gameid, address winner);
     event RoomAdded(uint256 _roomId);

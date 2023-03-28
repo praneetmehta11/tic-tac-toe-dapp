@@ -1,0 +1,3 @@
+
+export const WALLET_STATUS = 'WALLET_STATUS';
+export const WALLET_ADDRESS = 'WALLET_ADDRESS';

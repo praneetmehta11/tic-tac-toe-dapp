@@ -1,0 +1,83 @@
+.game_board_wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(235 236 240, 1);
+}
+
+.tic_tac_toe{
+    display: flex;
+    flex-direction: column;
+}
+
+.tic_tac_toe .board {
+   margin: 80px;
+}
+
+.tic_tac_toe .board .row{
+    display: flex;
+
+}
+
+.tic_tac_toe .board .row .col {
+    width: 80px;
+    height: 80px;
+    border: 1px solid black;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    font-size: 45px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.25s ease-in-out;
+    transform-style: preserve-3d ;
+}
+
+.tic_tac_toe .board .row .col:hover{
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    transform: translateY(-0.5px);
+}
+
+
+/**
+styling for the tic tac toe board
+**/
+
+.row:nth-child(1) .col:nth-child(1), .row:nth-child(1) .col:nth-child(2), .row:nth-child(1) .col:nth-child(3) {
+    border-top: none !important;
+}
+
+.row:nth-child(3) .col:nth-child(1), .row:nth-child(3) .col:nth-child(2), .row:nth-child(3) .col:nth-child(3) {
+    border-bottom: none !important;
+}
+
+.col:nth-child(1) {
+    border-left: none !important;
+}
+
+.col:nth-child(3) {
+    border-right: none !important;
+}
+
+
+.play_arena {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.active{
+    background-color: #14bdac;
+    color: white;
+    box-shadow: 0 2px 5px 1px rgba(64,60,67,.16);
+}
+
+.player{
+    padding: 10px;
+    border: 1px solid black;
+    min-width: 100px;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    box-shadow: 0 2px 5px 1px rgba(64,60,67,.28);
+}
