@@ -345,7 +345,7 @@ contract TicTacToeGame {
         );
         Game storage g = games[_gameId];
         require(g.balance > 0, "prize already claimed");
-        require(block.timestamp <= g.deadline, "winner not declared yet");
+        require(block.timestamp > g.deadline, "winner not declared yet");
         address from = msg.sender;
         address winner;
         if (g.turn == g.player1) {
