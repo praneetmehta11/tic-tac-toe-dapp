@@ -11,13 +11,12 @@ contract TicTacTioNFT is ERC721, ERC721URIStorage, Ownable {
 
     constructor() ERC721("TicTacTioNFT", "TTT-NFT") {}
 
-    function safeMint(
-        address to,
-        uint256 tokenId,
-        string memory uri
-    ) public onlyOwner {
+    function safeMint(address to, uint256 tokenId) external {
         _safeMint(to, tokenId);
-        _setTokenURI(tokenId, uri);
+        _setTokenURI(
+            tokenId,
+            "https://toppng.com/uploads/preview/winners-logo-winners-11563201425qcneaffa9o.png"
+        );
     }
 
     // The following functions are overrides required by Solidity.
@@ -37,8 +36,8 @@ contract TicTacTioNFT is ERC721, ERC721URIStorage, Ownable {
         address from,
         address to,
         uint256 tokenId
-    ) public virtual override {
-        revert("not alloed to transfer NFT");
+    ) public virtual override onlyOwner {
+        super.transferFrom(from, to, tokenId);
     }
 
     function safeTransferFrom(
@@ -46,7 +45,7 @@ contract TicTacTioNFT is ERC721, ERC721URIStorage, Ownable {
         address to,
         uint256 tokenId
     ) public virtual override {
-        revert("not alloed to transfer NFT");
+        require(false, "not alloed to transfer NFT");
     }
 
     function safeTransferFrom(
@@ -55,6 +54,6 @@ contract TicTacTioNFT is ERC721, ERC721URIStorage, Ownable {
         uint256 tokenId,
         bytes memory data
     ) public virtual override {
-        revert("not alloed to transfer NFT");
+        require(false, "not alloed to transfer NFT");
     }
 }

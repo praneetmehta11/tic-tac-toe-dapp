@@ -2,8 +2,13 @@
 pragma solidity >=0.8.2 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract TicTacToeGame {
+interface IERC721 {
+    function safeMint(address to, uint256 tokenId) external;
+}
+
+contract TicTacToeGame is Ownable {
     event GameCreated(uint256 _gameid, address creator);
     event GameStarted(
         uint256 _gameid,
@@ -42,6 +47,8 @@ contract TicTacToeGame {
 
     Game[] private games;
 
+    address private nft;
+
     mapping(address => uint256) userActiveGame;
 
     function getUserActiveGame(
@@ -54,7 +61,7 @@ contract TicTacToeGame {
         address _paytoken,
         uint256 _betamount,
         uint256 _timelimit
-    ) external {
+    ) external onlyOwner {
         IERC20 paytoken = IERC20(_paytoken);
         rooms.push(
             RoomInfo({
@@ -75,9 +82,16 @@ contract TicTacToeGame {
 
     function joinGame(uint256 _roomid, string memory _name) external {
         address from = msg.sender;
-
-        require(userActiveGame[from] == 0, "can not join the game");
         require(_roomid >= 0 && _roomid < rooms.length, "invalid room id");
+        if (userActiveGame[from] != 0) {
+            address winner = getWinner(userActiveGame[from] - 1);
+            if (
+                winner == address(0) ||
+                (winner == from && games[userActiveGame[from] - 1].balance > 0)
+            ) {
+                revert("can not join the game");
+            }
+        }
         RoomInfo storage ri = rooms[_roomid];
         require(
             ri.payToken.allowance(msg.sender, address(this)) >= ri.betAmount,
@@ -93,7 +107,7 @@ contract TicTacToeGame {
             g.balance += ri.betAmount;
             g.isRunning = true;
             g.deadline = block.timestamp + ri.timelimit;
-            emit GameStarted(games.length - 1, g.player1, g.player2, g.turn);
+            emit GameStarted(ri.game, g.player1, g.player2, g.turn);
         } else {
             uint256[3][3] memory board;
             games.push(
@@ -163,13 +177,12 @@ contract TicTacToeGame {
             delete userActiveGame[g.player1];
             delete userActiveGame[g.player2];
             emit WinnerDecleared(_gameId, from);
-            // transfer money to winner
             rooms[g.roomId].payToken.transferFrom(
                 address(this),
                 g.turn,
                 g.balance
             );
-            // mint NFT
+            IERC721(nft).safeMint(g.turn, _gameId);
             g.balance = 0;
         } else if (_isBoardFull(_gameId) == true) {
             g.isRunning = false;
@@ -214,6 +227,10 @@ contract TicTacToeGame {
             _check(_gameId, player, 0, 1, 2, 2, 1, 0)
         ) return true;
         return false;
+    }
+
+    function setNft(address _address) external onlyOwner {
+        nft = _address;
     }
 
     function _check(
@@ -355,7 +372,7 @@ contract TicTacToeGame {
         require(from == winner, "validation failed: you are not a winner");
         emit PrizeClaimed(_gameId, from);
         rooms[g.roomId].payToken.transferFrom(address(this), from, g.balance);
-        // mint NFT
+        IERC721(nft).safeMint(from, _gameId);
         g.balance = 0;
     }
 }
