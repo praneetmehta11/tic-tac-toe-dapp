@@ -1,5 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
-
+// SPDX-License-Identifier: MIT
 pragma solidity >=0.8.2 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -66,7 +65,7 @@ contract TicTacToeGame {
                 watingForPlayer: false
             })
         );
-        // paytoken.approve(address(this), 2**256 - 1);
+        paytoken.approve(address(this), 2 ** 256 - 1);
         emit RoomAdded(rooms.length - 1);
     }
 
@@ -80,11 +79,11 @@ contract TicTacToeGame {
         require(userActiveGame[from] == 0, "can not join the game");
         require(_roomid >= 0 && _roomid < rooms.length, "invalid room id");
         RoomInfo storage ri = rooms[_roomid];
-        // require(
-        //     ri.payToken.allowance(msg.sender, address(this)) >= ri.betAmount,
-        //     "you have to approve control of tokens"
-        // );
-        // ri.payToken.transferFrom(from, address(this), ri.betAmount);
+        require(
+            ri.payToken.allowance(msg.sender, address(this)) >= ri.betAmount,
+            "you have to approve control of tokens"
+        );
+        ri.payToken.transferFrom(from, address(this), ri.betAmount);
         if (ri.watingForPlayer == true) {
             ri.watingForPlayer = false;
             Game storage g = games[ri.game];
@@ -94,7 +93,7 @@ contract TicTacToeGame {
             g.balance += ri.betAmount;
             g.isRunning = true;
             g.deadline = block.timestamp + ri.timelimit;
-            emit GameStarted(ri.game, g.player1, g.player2, g.turn);
+            emit GameStarted(games.length - 1, g.player1, g.player2, g.turn);
         } else {
             uint256[3][3] memory board;
             games.push(
@@ -135,27 +134,27 @@ contract TicTacToeGame {
     function play(uint256 _gameId, uint256 _r, uint256 _c) external {
         require(
             _gameId >= 0 && _gameId < games.length,
-            "validation faild: invalid game id"
+            "validation failed: invalid game id"
         );
-        require(_r >= 0 && _r < 3, "validation faild: invalid row index");
-        require(_c >= 0 && _c < 3, "validation faild: invalid colum index");
+        require(_r >= 0 && _r < 3, "validation failed: invalid row index");
+        require(_c >= 0 && _c < 3, "validation failed: invalid column index");
         Game storage g = games[_gameId];
         require(
             block.timestamp < g.deadline,
-            "validation faild: deadline exceeded"
+            "validation failed: deadline exceeded"
         );
         require(g.isRunning == true, "game ended");
         address from = msg.sender;
         require(
             g.player1 == from || g.player2 == from,
-            "validation faild: wrong room"
+            "validation failed: wrong room"
         );
-        require(g.turn == from, "validation faild: not your turn");
+        require(g.turn == from, "validation failed: not your turn");
         uint256 player = 1;
         if (g.player2 == from) {
             player = 2;
         }
-        require(g.board[_r][_c] == 0, "validation faild: invalid move");
+        require(g.board[_r][_c] == 0, "validation failed: invalid move");
         g.board[_r][_c] = player;
         emit Move(_gameId, from, _r, _c);
 
@@ -165,26 +164,26 @@ contract TicTacToeGame {
             delete userActiveGame[g.player2];
             emit WinnerDecleared(_gameId, from);
             // transfer money to winner
-            // rooms[g.rooms].payToken.transferFrom(
-            //     address(this),
-            //     g.turn,
-            //     g.balance
-            // );
+            rooms[g.roomId].payToken.transferFrom(
+                address(this),
+                g.turn,
+                g.balance
+            );
             // mint NFT
             g.balance = 0;
         } else if (_isBoardFull(_gameId) == true) {
             g.isRunning = false;
-            // rooms[g.roomId].payToken.transferFrom(
-            //     address(this),
-            //     g.player1,
-            //     g.balance / 2
-            // ); 
+            rooms[g.roomId].payToken.transferFrom(
+                address(this),
+                g.player1,
+                g.balance / 2
+            );
             g.balance -= g.balance / 2;
-            // rooms[g.rooms].payToken.transferFrom(
-            //     address(this),
-            //     g.player2,
-            //     g.balance
-            // );
+            rooms[g.roomId].payToken.transferFrom(
+                address(this),
+                g.player2,
+                g.balance
+            );
             // transfer money back to both the players
             g.balance = 0;
             delete userActiveGame[g.player1];
@@ -249,7 +248,7 @@ contract TicTacToeGame {
     function getWinner(uint256 _gameId) public view returns (address _winner) {
         require(
             _gameId >= 0 && _gameId < games.length,
-            "validation faild: invalid game id"
+            "validation failed: invalid game id"
         );
         Game storage g = games[_gameId];
         if (_isWinner(_gameId, 1) == true) return g.player1;
@@ -270,12 +269,12 @@ contract TicTacToeGame {
     ) public view returns (bool winner) {
         require(
             _gameId >= 0 && _gameId < games.length,
-            "validation faild: invalid game id"
+            "validation failed: invalid game id"
         );
         Game storage g = games[_gameId];
         require(
             g.player1 == _player || g.player2 == _player,
-            "validation faild: wrong room"
+            "validation failed: wrong room"
         );
         uint256 player = 1;
         if (g.player2 == _player) {
@@ -341,7 +340,7 @@ contract TicTacToeGame {
     function claimPrize(uint256 _gameId) external {
         require(
             _gameId >= 0 && _gameId < games.length,
-            "validation faield: invalid game id"
+            "validation failed: invalid game id"
         );
         Game storage g = games[_gameId];
         require(g.balance > 0, "prize already claimed");
@@ -351,15 +350,11 @@ contract TicTacToeGame {
         if (g.turn == g.player1) {
             winner = g.player2;
         } else {
-            winner = g.player2;
+            winner = g.player1;
         }
-        require(from == winner, "validation faield: you are not a winner");
+        require(from == winner, "validation failed: you are not a winner");
         emit PrizeClaimed(_gameId, from);
-        // rooms[g.roomId].payToken.transferFrom(
-        //     address(this),
-        //     from,
-        //     g.balance
-        // );
+        rooms[g.roomId].payToken.transferFrom(address(this), from, g.balance);
         // mint NFT
         g.balance = 0;
     }
