@@ -4,7 +4,7 @@ import ERC20Abis from "./../abis/ERC20.json";
 let provider = null;
 let ticTacToeGameContract = null;
 
-const CONTRACT_ADDRESS = "0x960477BAeff6b95e4F7Db2542C03C99f84db376A";
+const CONTRACT_ADDRESS = "0x0367d269CB0A6d26B26B4768aAEE7130348CCEfb";
 
 /**
  * we will get access to provider and contract in all the components without reinitialization
