@@ -94,7 +94,7 @@ contract TicTacToeGame {
             g.balance += ri.betAmount;
             g.isRunning = true;
             g.deadline = block.timestamp + ri.timelimit;
-            emit GameStarted(games.length - 1, g.player1, g.player2, g.turn);
+            emit GameStarted(ri.game, g.player1, g.player2, g.turn);
         } else {
             uint256[3][3] memory board;
             games.push(
@@ -174,11 +174,11 @@ contract TicTacToeGame {
             g.balance = 0;
         } else if (_isBoardFull(_gameId) == true) {
             g.isRunning = false;
-            rooms[g.roomId].payToken.transferFrom(
-                address(this),
-                g.player1,
-                g.balance / 2
-            );
+            // rooms[g.roomId].payToken.transferFrom(
+            //     address(this),
+            //     g.player1,
+            //     g.balance / 2
+            // ); 
             g.balance -= g.balance / 2;
             // rooms[g.rooms].payToken.transferFrom(
             //     address(this),
