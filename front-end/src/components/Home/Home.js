@@ -37,7 +37,7 @@ const Home = (props) => {
         if (gameId >= 0) {
           const game = await getGame(gameId);
           if (parseInt(game.balance) === 0) {
-            setHasActiveGame(false);
+            setHasActiveGame(true);
             return;
           }
           if (game.turn !== "0x0000000000000000000000000000000000000000") setWaitingForPlayer(false);
