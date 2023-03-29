@@ -4,8 +4,12 @@ import { useSelector } from "react-redux";
 
 import { getContract, getGame } from "../../services/CustomEthers.service";
 
-const Player = ({ name, active = false }) => {
-  return <div className={`player ${active ? "active" : ""}`}>{name}</div>;
+const Player = ({ name, active = false, symbol }) => {
+  return (
+    <div className={`player ${active ? "active" : ""}`}>
+      {name} ({symbol})
+    </div>
+  );
 };
 
 const GameBoard = ({ gameId }) => {
@@ -87,11 +91,11 @@ const GameBoard = ({ gameId }) => {
 
         <div className="play_arena">
           <div>
-            <Player name={player1Name} active={turn === player1} />
+            <Player name={player1Name} symbol="X" active={turn === player1} />
           </div>
           <div className="board">{renderTicTacToeBoard(gameBoard)}</div>
           <div>
-            <Player name={player2Name} active={turn === player2} />
+            <Player name={player2Name} symbol="0" active={turn === player2} />
           </div>
         </div>
         <h1>{winner && `Game Over !!! Winner is ${winner}`}</h1>
