@@ -132,7 +132,7 @@ const Home = (props) => {
           </button>
         )}
         {roomInfo.betToken !== "" && renderRoomInfo()}
-        {!hasActiveGame && roomInfo.betToken !== "" && renderJoinGame()}
+        {!hasActiveGame && !claimPrize && roomInfo.betToken !== "" && renderJoinGame()}
         {hasActiveGame && waitingForPlayer === false && <GameBoard gameId={gameId}></GameBoard>}
         {hasActiveGame && waitingForPlayer === true && (
           <div>
