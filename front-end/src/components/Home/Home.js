@@ -86,6 +86,7 @@ const Home = (props) => {
       <div>
         <div>
           <table>
+            <tbody>
             <tr>
               <td>Token name:</td>
               <td>{roomInfo.tokenName}</td>
@@ -102,6 +103,7 @@ const Home = (props) => {
               <td>time limit:</td>
               <td>{roomInfo.timeLimit} Seconds</td>
             </tr>
+            </tbody>
           </table>
         </div>
       </div>

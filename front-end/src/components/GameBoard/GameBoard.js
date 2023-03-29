@@ -52,6 +52,11 @@ const GameBoard = ({ gameId }) => {
       let winnerName = winner.toLowerCase() === player1.toLowerCase() ? player1Name : player2Name;
       setWinner(winnerName);
     });
+
+    getContract().on('GameDraw', (id)=>{
+      if(parseInt(id) !== gameId) return;
+      alert('The game ended in a draw!!! Reload the page to play again');
+    })
   });
 
   async function handleTurn(row, col) {
