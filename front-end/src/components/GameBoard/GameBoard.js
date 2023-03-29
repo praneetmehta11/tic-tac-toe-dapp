@@ -83,7 +83,7 @@ const GameBoard = ({ gameId }) => {
   return (
     <div className="game_board_wrapper">
       <div className="tic_tac_toe">
-        <h1>{turn.toLowerCase() === primaryPlayer.toLowerCase() && `Your turn`}</h1>
+        <h1 className="text_center">{turn.toLowerCase() === primaryPlayer.toLowerCase() && `Your turn`}</h1>
 
         <div className="play_arena">
           <div>

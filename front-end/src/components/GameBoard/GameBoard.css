@@ -81,3 +81,8 @@ styling for the tic tac toe board
     border: 1px solid transparent;
     box-shadow: 0 2px 5px 1px rgba(64,60,67,.28);
 }
+
+.text_center{
+    text-align: center;
+    margin-top: 45px;
+}
